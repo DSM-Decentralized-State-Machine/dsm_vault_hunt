@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#121212"
+    tools:context=".Controller.DSMMapActivity">
+
+    <org.osmdroid.views.MapView
+        android:id="@+id/osmmap"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tilesource="Mapnik" />
+
+    <LinearLayout
+        android:id="@+id/menuPrincipal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"
+        android:background="#aa222222"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+        <ImageButton
+            android:id="@+id/botaoPerfil"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="#00ffffff"
+            android:onClick="clickPerfil"
+            android:scaleType="centerInside"
+            android:src="@drawable/male_profile" />
+
+        <TextView
+            android:id="@+id/txtNomeUser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Username"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp" />
+
+        <ImageButton
+            android:id="@+id/botaoPokedex"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:background="#00ffffff"
+            android:onClick="clickPokedex"
+            android:scaleType="centerInside"
+            android:src="@drawable/pokedex" />
+
+        <ImageButton
+            android:id="@+id/botaoMapaCaptura"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:background="#00ffffff"
+            android:onClick="clickMapaCaptura"
+            android:scaleType="centerInside"
+            android:src="@drawable/mapa_captura" />
+
+        <ImageButton
+            android:id="@+id/botaoOvo"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:background="#00ffffff"
+            android:onClick="clickOvo"
+            android:scaleType="centerInside"
+            android:src="@drawable/ovo_verde" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/statusText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="10dp"
+        android:background="#aa000000"
+        android:gravity="center"
+        android:padding="5dp"
+        android:text="Scanning for DSM Limbo Vaults..."
+        android:textColor="#FF00FF"
+        android:textSize="14sp" />
+
+</RelativeLayout>

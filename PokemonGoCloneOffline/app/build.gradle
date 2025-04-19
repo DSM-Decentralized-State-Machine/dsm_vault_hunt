@@ -1,0 +1,110 @@
+plugins {
+    id("com.android.application")
+}
+
+android {
+    namespace = "teste.lucasvegi.pokemongooffline"
+    compileSdk = 34
+
+    ndkVersion = "21.4.7075529"
+
+    defaultConfig {
+        applicationId = "teste.lucasvegi.pokemongooffline"
+        minSdk = 23
+        targetSdk = 34
+        versionCode = 1
+        versionName = "0.4"
+        multiDexEnabled = true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled = false
+            proguardFiles(
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    "proguard-rules.pro"
+            )
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+    packagingOptions {
+        jniLibs {
+            pickFirsts += [
+                    "com/j256/ormlite/**",
+                    "kotlin/**"
+            ]
+        }
+        resources {
+            excludes += [
+                    "META-INF/DEPENDENCIES",
+                    "META-INF/LICENSE",
+                    "META-INF/LICENSE.txt",
+                    "META-INF/license.txt",
+                    "META-INF/NOTICE",
+                    "META-INF/NOTICE.txt",
+                    "META-INF/notice.txt",
+                    "META-INF/ASL2.0",
+                    "META-INF/*.kotlin_module",
+                    "com/j256/ormlite/core/README.txt"
+            ]
+            pickFirsts += [
+                    "com/j256/ormlite/**",
+                    "kotlin/**"
+            ]
+        }
+    }
+
+    lint {
+        abortOnError = false
+        checkReleaseBuilds = false
+    }
+}
+
+dependencies {
+    implementation(fileTree(dir: "libs", include: ["*.jar"]))
+    // AppCompat and ConstraintLayout
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("com.google.android.material:material:1.10.0")
+
+    // OSMDroid libraries for map integration
+    implementation("org.osmdroid:osmdroid-android:6.1.16") {
+        exclude group: "com.j256.ormlite"
+    }
+    implementation("org.osmdroid:osmdroid-wms:6.1.16") {
+        exclude group: "com.j256.ormlite"
+    }
+    implementation("org.osmdroid:osmdroid-mapsforge:6.1.16") {
+        exclude group: "com.j256.ormlite"
+    }
+    implementation("org.osmdroid:osmdroid-geopackage:6.1.16") {
+        exclude group: "com.j256.ormlite"
+    }
+
+    // Add ormlite dependency explicitly to avoid conflicts
+    implementation("com.j256.ormlite:ormlite-android:6.1")
+
+    // Multidex support
+    implementation("androidx.multidex:multidex:2.0.1")
+
+    // Add core dependency with compatible versions
+    implementation("androidx.core:core:1.12.0")
+    implementation("androidx.core:core-ktx:1.12.0")
+
+    // Add JDK8 compatibility explicitly
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.10")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.10")
+
+    // JSON handling
+    implementation("org.json:json:20231013")
+
+}
