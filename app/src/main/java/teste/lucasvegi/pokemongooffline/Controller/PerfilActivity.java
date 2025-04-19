@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import teste.lucasvegi.pokemongooffline.Model.ControladoraFachadaSingleton;
+import teste.lucasvegi.pokemongooffline.Model.DSMControllerFacadeSingleton;
 import teste.lucasvegi.pokemongooffline.Model.Pokemon;
 import teste.lucasvegi.pokemongooffline.Model.PokemonCapturado;
 import teste.lucasvegi.pokemongooffline.Model.Usuario;
@@ -28,6 +29,21 @@ import teste.lucasvegi.pokemongooffline.Util.BancoDadosSingleton;
 
 
 public class PerfilActivity extends Activity {
+    
+    /**
+     * Get the user from either the original or DSM singleton
+     */
+    private Usuario getUsuario() {
+        // First try from ControladoraFachadaSingleton
+        Usuario usuario = ControladoraFachadaSingleton.getInstance().getUsuario();
+        
+        // If not found, try from DSMControllerFacadeSingleton
+        if (usuario == null) {
+            usuario = DSMControllerFacadeSingleton.getInstance().getUsuario();
+        }
+        
+        return usuario;
+    }
 
     private ProgressBar progressBar;
     private int progressStatus = 0;
@@ -75,24 +91,55 @@ public class PerfilActivity extends Activity {
         TextView txtXp = (TextView) findViewById(R.id.txtXp);           //Referência da textView de xp
         TextView txtNivel = (TextView) findViewById(R.id.txtNivel);     //Referência da textView de nível
 
-        Log.d("usuario", "XP: " + ControladoraFachadaSingleton.getInstance().getUsuario().getXp());
-        Log.d("usuario", "Nivel: " + ControladoraFachadaSingleton.getInstance().getUsuario().getNivel());
+        // Get user from either singleton
+        Usuario usuario = getUsuario();
+        
+        // Check if user is null before trying to access methods
+        if (usuario != null) {
+            Log.d("usuario", "XP: " + usuario.getXp());
+            Log.d("usuario", "Nivel: " + usuario.getNivel());
+        } else {
+            Log.e("usuario", "Usuario is null. Returning to login screen.");
+            // Return to login screen if user is null
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
 
-        Cursor user = BancoDadosSingleton.getInstance().buscar("usuario", new String[]{"nivel", "xp"},
-                "login= '" + ControladoraFachadaSingleton.getInstance().getUsuario().getLogin()+"'", "");
+        Cursor user = null;
+        Usuario usuario = getUsuario();
+        if (usuario != null) {
+            user = BancoDadosSingleton.getInstance().buscar("usuario", new String[]{"nivel", "xp"},
+                    "login= '" + usuario.getLogin()+"'", "");
+        } else {
+            // If we reach here, something is wrong with our earlier check
+            Log.e("usuario", "Usuario is still null after check!");
+            return;
+        }
 
         while(user.moveToNext()) {
             int idxp = user.getColumnIndex("xp");
             int idnivel = user.getColumnIndex("nivel");
 
             progressStatus = user.getInt(idxp);                         //Armazena o xp atual do usuário após a captura
-            xpMaxBar = ControladoraFachadaSingleton.getInstance().xpMaximo(ControladoraFachadaSingleton.getInstance().getUsuario().getNivel());      //Calcula o valor máximo da barra (importante para que ela termine quando o usuário upar)
+            // Try to get the XP maximum value from either controller
+            int nivelUsuario = usuario.getNivel();
+            if (ControladoraFachadaSingleton.getInstance().getUsuario() != null) {
+                xpMaxBar = ControladoraFachadaSingleton.getInstance().xpMaximo(nivelUsuario);      
+            } else if (DSMControllerFacadeSingleton.getInstance().getUsuario() != null) {
+                xpMaxBar = DSMControllerFacadeSingleton.getInstance().xpMaximo(nivelUsuario);
+            } else {
+                // Default fallback if both controllers fail
+                xpMaxBar = nivelUsuario * 1000;
+            }
+            
             progressBar.setMax(xpMaxBar);                               //Setando o valor máximo da progressBar
             progressBar.setProgress(progressStatus);                    //Setando o progresso da progressBar de acordo com o xp atual + xp de captura
             xpNumber = Integer.toString(progressStatus) + "/" + Integer.toString(xpMaxBar);   // Criando a string da textView do xp
 
-            txtXp.setText(xpNumber);                                                                                //Setando a textView do xp para xpAtual/xpMáximo
-            txtNivel.setText("Nível " + ControladoraFachadaSingleton.getInstance().getUsuario().getNivel());        //Setando a textView do nível para o nível atual do usuário
+            txtXp.setText(xpNumber);                                    //Setando a textView do xp para xpAtual/xpMáximo
+            txtNivel.setText("Nível " + usuario.getNivel());           //Setando a textView do nível para o nível atual do usuário
 
             Log.d("usuario","XP banco: " + user.getInt(idxp));
             Log.d("usuario","Nivel banco: " + user.getInt(idnivel));
@@ -106,25 +153,37 @@ public class PerfilActivity extends Activity {
         troca = (Button) findViewById(R.id.buttonTroca);
 
         try {
-            //Define o nome do treinador
-            txtNomeTreinador.setText(ControladoraFachadaSingleton.getInstance().getUsuario().getLogin());
+            // Make sure usuario is not null before accessing its properties
+            Usuario usuario = getUsuario();
+            if (usuario != null) {
+                //Define o nome do treinador
+                txtNomeTreinador.setText(usuario.getLogin());
 
-            //Define a imagem do perfil baseando-se no sexo do usuário
-            if(ControladoraFachadaSingleton.getInstance().getUsuario().getSexo().equals("M"))
+                //Define a imagem do perfil baseando-se no sexo do usuário
+                if(usuario.getSexo().equals("M"))
+                    imageView.setImageResource(R.drawable.male_grande);
+                else
+                    imageView.setImageResource(R.drawable.female_grande);
+
+                //Define o início da aventura
+                txtInicioAventura.setText(usuario.getDtCadastro());
+
+                //Define o número de pokemons capturados pelo usuário
+                int contCaptura = 0;
+                if (usuario.getPokemons() != null) {
+                    for (Map.Entry<Pokemon,List<PokemonCapturado>> entry : usuario.getPokemons().entrySet()){
+                        contCaptura += entry.getValue().size();
+                    }
+                }
+                txtNumCapturas.setText(contCaptura+"");
+            } else {
+                Log.e("PERFIL", "Usuario is null in try-catch block");
+                // Set default values if user is null
+                txtNomeTreinador.setText("Unknown");
                 imageView.setImageResource(R.drawable.male_grande);
-            else
-                imageView.setImageResource(R.drawable.female_grande);
-
-            //Define o início da aventura
-            txtInicioAventura.setText(ControladoraFachadaSingleton.getInstance().getUsuario().getDtCadastro());
-
-            //Define o número de pokemons capturados pelo usuário
-            int contCaptura = 0;
-            for (Map.Entry<Pokemon,List<PokemonCapturado>> entry : ControladoraFachadaSingleton.getInstance().getUsuario().getPokemons().entrySet()){
-                contCaptura += entry.getValue().size();
+                txtInicioAventura.setText("Unknown");
+                txtNumCapturas.setText("0");
             }
-            txtNumCapturas.setText(contCaptura+"");
-
         }catch (Exception e){
             Log.e("PERFIL", "ERRO: " + e.getMessage());
         }
