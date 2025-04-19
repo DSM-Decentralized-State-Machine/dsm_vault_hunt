@@ -108,7 +108,6 @@ public class PerfilActivity extends Activity {
         }
 
         Cursor user = null;
-        Usuario usuario = getUsuario();
         if (usuario != null) {
             user = BancoDadosSingleton.getInstance().buscar("usuario", new String[]{"nivel", "xp"},
                     "login= '" + usuario.getLogin()+"'", "");
