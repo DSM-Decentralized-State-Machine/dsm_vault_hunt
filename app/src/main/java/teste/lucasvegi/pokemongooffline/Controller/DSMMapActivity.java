@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Criteria;
@@ -250,18 +251,33 @@ public class DSMMapActivity extends AppCompatActivity implements LocationListene
         
         // Set icon based on variant
         try {
-            AssetManager assetManager = getAssets();
-            InputStream inputStream = assetManager.open(vault.getChestImageAsset());
-            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            // Get the chest drawable from resources directly
+            Drawable chest = getResources().getDrawable(getChestDrawableForVariant(vault));
             
-            // Scale down the bitmap to a reasonable size for a marker
-            bitmap = Bitmap.createScaledBitmap(bitmap, 100, 100, true);
+            // Create a scaled version of the drawable to prevent oversized icons
+            int width = chest.getIntrinsicWidth() / 4;  // 1/4 of the original size
+            int height = chest.getIntrinsicHeight() / 4;  // 1/4 of the original size
             
-            Drawable drawable = new BitmapDrawable(getResources(), bitmap);
-            marker.setIcon(getResources().getDrawable(getChestDrawableForVariant(vault)));
+            chest.setBounds(0, 0, width, height);
+            Bitmap scaledBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(scaledBitmap);
+            chest.draw(canvas);
+            
+            Drawable resizedDrawable = new BitmapDrawable(getResources(), scaledBitmap);
+            marker.setIcon(resizedDrawable);
         } catch (Exception e) {
             Log.e(TAG, "Error loading vault marker icon", e);
-            marker.setIcon(getResources().getDrawable(R.drawable.dsm_bronze_chest));
+            // Use a default marker with proper resizing
+            Drawable defaultChest = getResources().getDrawable(R.drawable.dsm_bronze_chest);
+            int width = defaultChest.getIntrinsicWidth() / 4;
+            int height = defaultChest.getIntrinsicHeight() / 4;
+            
+            defaultChest.setBounds(0, 0, width, height);
+            Bitmap scaledBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(scaledBitmap);
+            defaultChest.draw(canvas);
+            
+            marker.setIcon(new BitmapDrawable(getResources(), scaledBitmap));
         }
         
         // Set up click listener
