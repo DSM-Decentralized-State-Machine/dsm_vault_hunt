@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Original Pokemon colors -->
     <color name="pokestopBorder">#23D7F6</color>
-
+    
+    <!-- DSM Themed Colors - Based on the neon logo -->
+    <color name="dsmPrimary">#FF00FF</color>        <!-- Neon pink for DSM letters -->
+    <color name="dsmSecondary">#00FFFF</color>      <!-- Neon blue for the line -->
+    <color name="dsmAccent">#FFD700</color>         <!-- Gold for the text -->
+    <color name="dsmBackground">#000000</color>     <!-- Black background -->
+    <color name="dsmDark">#000000</color>           <!-- Black for dark elements -->
+    <color name="dsmLight">#FFFFFF</color>          <!-- White for light elements -->
+    <color name="dsmWarning">#FF0000</color>        <!-- Red for warnings/errors -->
+    <color name="dsmHighlight">#8A2BE2</color>      <!-- Purple highlight color -->
+    <color name="dsmVaultBorder">#00FFFF</color>    <!-- Neon blue for border -->
+    
+    <!-- Chest colors -->
+    <color name="dsmBronzeChest">#CD7F32</color>     <!-- Bronze chest color -->
+    <color name="dsmSilverChest">#4682B4</color>     <!-- Silver chest color -->
+    <color name="dsmGoldChest">#FFD700</color>      <!-- Gold chest color -->
 </resources>

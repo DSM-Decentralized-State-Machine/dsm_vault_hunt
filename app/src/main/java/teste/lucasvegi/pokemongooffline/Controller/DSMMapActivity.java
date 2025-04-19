@@ -70,6 +70,21 @@ public class DSMMapActivity extends AppCompatActivity implements LocationListene
     private static final float VAULT_INTERACTION_DISTANCE_METERS = 100f;
     private static final int SCAN_INTERVAL_MINUTES = 2;
     
+    /**
+     * Helper method to get the appropriate chest drawable based on the vault variant
+     */
+    private int getChestDrawableForVariant(DSMLimboVault vault) {
+        switch (vault.getVariant()) {
+            case GOLD:
+                return R.drawable.dsm_gold_chest;
+            case SILVER:
+                return R.drawable.dsm_silver_chest;
+            case BRONZE:
+            default:
+                return R.drawable.dsm_bronze_chest;
+        }
+    }
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -185,6 +200,18 @@ public class DSMMapActivity extends AppCompatActivity implements LocationListene
         // Get nearby vaults
         List<DSMLimboVault> nearbyVaults = new ArrayList<>();
         
+        // Get current active event
+        DSMClient.RegionEvent currentEvent = dsmClient.getCurrentActiveEvent();
+        
+        // Check if there's an active event
+        if (currentEvent == null) {
+            // No active event, show message and return
+            runOnUiThread(() -> Toast.makeText(this, "No active treasure hunt event", Toast.LENGTH_SHORT).show());
+            return;
+        }
+        
+        String regionId = currentEvent.getRegionId();
+        
         // Simulate finding 3-5 random vaults in the area
         int numVaults = 3 + (int)(Math.random() * 3);
         double baseLat = location.getLatitude();
@@ -200,8 +227,7 @@ public class DSMMapActivity extends AppCompatActivity implements LocationListene
             double randLng = baseLng + (Math.random() * 2 - 1) * lngDelta;
             
             // Create vault
-            DSMLimboVault vault = DSMLimboVault.createRandomChest(dsmClient.getCurrentActiveEvent().getRegionId(), 
-                    randLat, randLng);
+            DSMLimboVault vault = DSMLimboVault.createRandomChest(regionId, randLat, randLng);
             nearbyVaults.add(vault);
         }
         
@@ -232,11 +258,10 @@ public class DSMMapActivity extends AppCompatActivity implements LocationListene
             bitmap = Bitmap.createScaledBitmap(bitmap, 100, 100, true);
             
             Drawable drawable = new BitmapDrawable(getResources(), bitmap);
-            marker.setIcon(drawable);
-            inputStream.close();
+            marker.setIcon(getResources().getDrawable(getChestDrawableForVariant(vault)));
         } catch (Exception e) {
             Log.e(TAG, "Error loading vault marker icon", e);
-            marker.setIcon(getResources().getDrawable(R.drawable.pokemon_go_logo));
+            marker.setIcon(getResources().getDrawable(R.drawable.dsm_bronze_chest));
         }
         
         // Set up click listener

@@ -75,11 +75,8 @@ public class DSMMainActivity extends AppCompatActivity {
     
     private void loadLogoFromAssets() {
         try {
-            AssetManager assetManager = getAssets();
-            InputStream inputStream = assetManager.open("IMG_7010.PNG"); // Use middle-sized chest image as logo
-            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-            imageLogo.setImageBitmap(bitmap);
-            inputStream.close();
+            // Use a drawable resource instead of an asset file
+            imageLogo.setImageResource(R.drawable.pokeball);
         } catch (Exception e) {
             Log.e(TAG, "Error loading logo: " + e.getMessage());
         }

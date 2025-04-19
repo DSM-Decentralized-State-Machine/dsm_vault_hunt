@@ -3,11 +3,28 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/dsmPrimary</item>
+        <item name="colorPrimaryDark">@color/dsmDark</item>
+        <item name="colorAccent">@color/dsmAccent</item>
+        <item name="android:colorBackground">@color/dsmBackground</item>
+        <item name="android:textColorPrimary">@color/dsmDark</item>
+        <item name="android:textColorSecondary">@color/dsmDark</item>
     </style>
+    
     <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
+        <item name="colorPrimary">@color/dsmPrimary</item>
+        <item name="colorPrimaryDark">@color/dsmDark</item>
+        <item name="colorAccent">@color/dsmAccent</item>
+        <item name="android:colorBackground">@color/dsmBackground</item>
+    </style>
+
+    <!-- DSM button style -->
+    <style name="DsmButtonStyle" parent="Widget.AppCompat.Button">
+        <item name="android:backgroundTint">@color/dsmPrimary</item>
+        <item name="android:textColor">@color/dsmLight</item>
     </style>
 
 </resources>

@@ -35,11 +35,22 @@ public class PerfilActivity extends Activity {
      */
     private Usuario getUsuario() {
         // First try from ControladoraFachadaSingleton
-        Usuario usuario = ControladoraFachadaSingleton.getInstance().getUsuario();
+        Usuario usuario = null;
         
-        // If not found, try from DSMControllerFacadeSingleton
+        try {
+            usuario = ControladoraFachadaSingleton.getInstance().getUsuario();
+            
+            // If not found, try from DSMControllerFacadeSingleton
+            if (usuario == null) {
+                usuario = DSMControllerFacadeSingleton.getInstance().getUsuario();
+            }
+        } catch (Exception e) {
+            Log.e("PERFIL", "Error getting user: " + e.getMessage());
+        }
+        
+        // If no user is found, redirect to login instead of using null
         if (usuario == null) {
-            usuario = DSMControllerFacadeSingleton.getInstance().getUsuario();
+            Log.d("PERFIL", "No user found, will redirect to login");
         }
         
         return usuario;
@@ -95,10 +106,7 @@ public class PerfilActivity extends Activity {
         Usuario usuario = getUsuario();
         
         // Check if user is null before trying to access methods
-        if (usuario != null) {
-            Log.d("usuario", "XP: " + usuario.getXp());
-            Log.d("usuario", "Nivel: " + usuario.getNivel());
-        } else {
+        if (usuario == null) {
             Log.e("usuario", "Usuario is null. Returning to login screen.");
             // Return to login screen if user is null
             Intent intent = new Intent(this, LoginActivity.class);
@@ -107,15 +115,14 @@ public class PerfilActivity extends Activity {
             return;
         }
 
+        // Now we can safely log user info
+        Log.d("usuario", "XP: " + usuario.getXp());
+        Log.d("usuario", "Nivel: " + usuario.getNivel());
+
+
         Cursor user = null;
-        if (usuario != null) {
-            user = BancoDadosSingleton.getInstance().buscar("usuario", new String[]{"nivel", "xp"},
-                    "login= '" + usuario.getLogin()+"'", "");
-        } else {
-            // If we reach here, something is wrong with our earlier check
-            Log.e("usuario", "Usuario is still null after check!");
-            return;
-        }
+        user = BancoDadosSingleton.getInstance().buscar("usuario", new String[]{"nivel", "xp"},
+                "login= '" + usuario.getLogin()+"'", "");
 
         while(user.moveToNext()) {
             int idxp = user.getColumnIndex("xp");
@@ -153,7 +160,6 @@ public class PerfilActivity extends Activity {
 
         try {
             // Make sure usuario is not null before accessing its properties
-            Usuario usuario = getUsuario();
             if (usuario != null) {
                 //Define o nome do treinador
                 txtNomeTreinador.setText(usuario.getLogin());
